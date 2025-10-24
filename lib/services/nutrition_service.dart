@@ -1,8 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/nutrition/models/food_item.dart';
+import '../core/error/exceptions.dart';
+import 'data_service.dart';
 
 class NutritionService {
   final SupabaseClient _supabase = Supabase.instance.client;
+  final DataService _dataService = DataService();
 
   // Mock food database for MVP
   static final List<FoodItem> _mockFoodDatabase = [
@@ -147,45 +150,47 @@ class NutritionService {
 
   Future<void> logFood(FoodLog foodLog) async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('User not authenticated');
-
-      await _supabase.from('food_logs').insert({
-        'id': foodLog.id,
-        'user_id': user.id,
-        'timestamp': foodLog.timestamp.toIso8601String(),
-        'meal_type': foodLog.mealType,
-        'food_item': foodLog.foodItem.toJson(),
+      final nutritionData = {
+        'food_name': foodLog.foodItem.name,
+        'calories': (foodLog.foodItem.calories * foodLog.quantity).round(),
+        'protein_g': foodLog.foodItem.protein * foodLog.quantity,
+        'carbs_g': foodLog.foodItem.carbs * foodLog.quantity,
+        'fat_g': foodLog.foodItem.fat * foodLog.quantity,
+        'fiber_g': foodLog.foodItem.fiber * foodLog.quantity,
+        'sugar_g': foodLog.foodItem.sugar * foodLog.quantity,
+        'sodium_mg': foodLog.foodItem.sodium * foodLog.quantity,
         'quantity': foodLog.quantity,
-        'notes': foodLog.notes,
-        'created_at': DateTime.now().toIso8601String(),
-      });
+        'unit': foodLog.foodItem.servingSize,
+        'meal_type': foodLog.mealType,
+      };
+
+      await _dataService.saveNutritionLog(nutritionData);
+    } on AuthException catch (e) {
+      throw AuthException(e.message);
+    } on ServerException catch (e) {
+      throw ServerException(e.message);
     } catch (e) {
-      throw Exception('Failed to log food: ${e.toString()}');
+      throw ServerException('Failed to log food: ${e.toString()}');
     }
   }
 
   Future<List<FoodLog>> getFoodLogs(DateTime date) async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('User not authenticated');
-
       final startOfDay = DateTime(date.year, date.month, date.day);
       final endOfDay = startOfDay.add(const Duration(days: 1));
 
-      final response = await _supabase
-          .from('food_logs')
-          .select()
-          .eq('user_id', user.id)
-          .gte('timestamp', startOfDay.toIso8601String())
-          .lt('timestamp', endOfDay.toIso8601String())
-          .order('timestamp', ascending: true);
+      final logs = await _dataService.getNutritionLogs(
+        startDate: startOfDay,
+        endDate: endOfDay,
+      );
 
-      return (response as List)
-          .map((log) => FoodLog.fromJson(log as Map<String, dynamic>))
-          .toList();
+      return logs.map((log) => FoodLog.fromJson(log)).toList();
+    } on AuthException catch (e) {
+      throw AuthException(e.message);
+    } on ServerException catch (e) {
+      throw ServerException(e.message);
     } catch (e) {
-      throw Exception('Failed to get food logs: ${e.toString()}');
+      throw ServerException('Failed to get food logs: ${e.toString()}');
     }
   }
 
@@ -202,52 +207,60 @@ class NutritionService {
   Future<void> deleteFoodLog(String logId) async {
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('User not authenticated');
+      if (user == null) throw AuthException('User not authenticated');
 
       await _supabase
-          .from('food_logs')
+          .from('nutrition_logs')
           .delete()
           .eq('id', logId)
           .eq('user_id', user.id);
+    } on PostgrestException catch (e) {
+      throw ServerException(e.message);
     } catch (e) {
-      throw Exception('Failed to delete food log: ${e.toString()}');
+      throw ServerException('Failed to delete food log: ${e.toString()}');
     }
   }
 
   Future<void> updateFoodLog(FoodLog foodLog) async {
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('User not authenticated');
+      if (user == null) throw AuthException('User not authenticated');
+
+      final nutritionData = {
+        'food_name': foodLog.foodItem.name,
+        'calories': (foodLog.foodItem.calories * foodLog.quantity).round(),
+        'protein_g': foodLog.foodItem.protein * foodLog.quantity,
+        'carbs_g': foodLog.foodItem.carbs * foodLog.quantity,
+        'fat_g': foodLog.foodItem.fat * foodLog.quantity,
+        'fiber_g': foodLog.foodItem.fiber * foodLog.quantity,
+        'sugar_g': foodLog.foodItem.sugar * foodLog.quantity,
+        'sodium_mg': foodLog.foodItem.sodium * foodLog.quantity,
+        'quantity': foodLog.quantity,
+        'unit': foodLog.foodItem.servingSize,
+        'meal_type': foodLog.mealType,
+      };
 
       await _supabase
-          .from('food_logs')
-          .update({
-            'meal_type': foodLog.mealType,
-            'food_item': foodLog.foodItem.toJson(),
-            'quantity': foodLog.quantity,
-            'notes': foodLog.notes,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
+          .from('nutrition_logs')
+          .update(nutritionData)
           .eq('id', foodLog.id)
           .eq('user_id', user.id);
+    } on PostgrestException catch (e) {
+      throw ServerException(e.message);
     } catch (e) {
-      throw Exception('Failed to update food log: ${e.toString()}');
+      throw ServerException('Failed to update food log: ${e.toString()}');
     }
   }
 
   // Calculate daily calorie target based on user goals
   Future<double> getDailyCalorieTarget() async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) return 2000.0; // Default
-
-      final response = await _supabase
-          .from('user_goals')
-          .select('daily_calories')
-          .eq('user_id', user.id)
-          .single();
-
-      return (response['daily_calories'] as num).toDouble();
+      final goals = await _dataService.getUserGoals();
+      if (goals.isNotEmpty) {
+        final goal = goals.first;
+        return (goal['target_value'] as num?)?.toDouble() ?? 2000.0;
+      }
+      return 2000.0; // Default if no goals set
     } catch (e) {
       return 2000.0; // Default if no goals set
     }
@@ -256,25 +269,19 @@ class NutritionService {
   // Calculate macro targets
   Future<Map<String, double>> getMacroTargets() async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
+      final goals = await _dataService.getUserGoals();
+      if (goals.isNotEmpty) {
+        // This would need to be implemented based on your goals structure
         return {
           'protein': 150.0,
           'carbs': 250.0,
           'fat': 80.0,
         };
       }
-
-      final response = await _supabase
-          .from('user_goals')
-          .select('protein_target, carb_target, fat_target')
-          .eq('user_id', user.id)
-          .single();
-
       return {
-        'protein': (response['protein_target'] as num).toDouble(),
-        'carbs': (response['carb_target'] as num).toDouble(),
-        'fat': (response['fat_target'] as num).toDouble(),
+        'protein': 150.0,
+        'carbs': 250.0,
+        'fat': 80.0,
       };
     } catch (e) {
       return {
