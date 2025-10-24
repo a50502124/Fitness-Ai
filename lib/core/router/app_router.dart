@@ -14,18 +14,10 @@ import '../../features/profile/screens/profile_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     redirect: (context, state) {
-      // Skip redirect for auth routes to avoid infinite loops
-      if (state.uri.path == '/login' || state.uri.path == '/signup') {
-        return null;
-      }
-      
-      // For now, redirect to home to test the app
-      if (state.uri.path == '/') {
-        return '/home';
-      }
-      
+      // For demo mode, allow access to all screens
+      // TODO: Implement proper auth guards when Supabase is configured
       return null;
     },
     routes: [

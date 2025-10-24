@@ -2,11 +2,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/models/user_model.dart';
 
 class AuthService {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  SupabaseClient? get _supabase {
+    try {
+      return Supabase.instance.client;
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future<UserModel?> getCurrentUser() async {
     try {
-      final session = _supabase.auth.currentSession;
+      if (_supabase == null) return null;
+      final session = _supabase!.auth.currentSession;
       if (session?.user != null) {
         final userData = await _supabase
             .from('users')
@@ -23,7 +30,10 @@ class AuthService {
 
   Future<UserModel> signInWithEmail(String email, String password) async {
     try {
-      final response = await _supabase.auth.signInWithPassword(
+      if (_supabase == null) {
+        throw Exception('Database not connected. Please configure Supabase.');
+      }
+      final response = await _supabase!.auth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -33,7 +43,7 @@ class AuthService {
       }
 
       // Get user data from database
-      final userData = await _supabase
+      final userData = await _supabase!
           .from('users')
           .select()
           .eq('id', response.user!.id)
@@ -51,7 +61,10 @@ class AuthService {
     String? name,
   ) async {
     try {
-      final response = await _supabase.auth.signUp(
+      if (_supabase == null) {
+        throw Exception('Database not connected. Please configure Supabase.');
+      }
+      final response = await _supabase!.auth.signUp(
         email: email,
         password: password,
       );
@@ -70,7 +83,7 @@ class AuthService {
         'updated_at': DateTime.now().toIso8601String(),
       };
 
-      await _supabase.from('users').insert(userData);
+      await _supabase!.from('users').insert(userData);
 
       return UserModel.fromJson(userData);
     } catch (e) {
@@ -80,7 +93,10 @@ class AuthService {
 
   Future<UserModel> signInWithGoogle() async {
     try {
-      final response = await _supabase.auth.signInWithOAuth(
+      if (_supabase == null) {
+        throw Exception('Database not connected. Please configure Supabase.');
+      }
+      final response = await _supabase!.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'io.supabase.fitcoachai://login-callback/',
       );
@@ -92,7 +108,7 @@ class AuthService {
       // Wait for the session to be established
       await Future.delayed(const Duration(seconds: 2));
       
-      final session = _supabase.auth.currentSession;
+      final session = _supabase!.auth.currentSession;
       if (session?.user == null) {
         throw Exception('Google login failed - no user session');
       }
@@ -100,7 +116,7 @@ class AuthService {
       final user = session!.user;
 
       // Check if user exists in database
-      final existingUser = await _supabase
+      final existingUser = await _supabase!
           .from('users')
           .select()
           .eq('id', user.id)
@@ -118,7 +134,7 @@ class AuthService {
           'updated_at': DateTime.now().toIso8601String(),
         };
 
-        await _supabase.from('users').insert(userData);
+        await _supabase!.from('users').insert(userData);
         return UserModel.fromJson(userData);
       } else {
         return UserModel.fromJson(existingUser);
@@ -130,7 +146,8 @@ class AuthService {
 
   Future<void> signOut() async {
     try {
-      await _supabase.auth.signOut();
+      if (_supabase == null) return;
+      await _supabase!.auth.signOut();
     } catch (e) {
       throw Exception('Logout failed: ${e.toString()}');
     }
@@ -138,7 +155,10 @@ class AuthService {
 
   Future<void> resetPassword(String email) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email);
+      if (_supabase == null) {
+        throw Exception('Database not connected. Please configure Supabase.');
+      }
+      await _supabase!.auth.resetPasswordForEmail(email);
     } catch (e) {
       throw Exception('Password reset failed: ${e.toString()}');
     }
@@ -146,7 +166,10 @@ class AuthService {
 
   Future<void> updateUserProfile(UserModel user) async {
     try {
-      await _supabase.from('users').update({
+      if (_supabase == null) {
+        throw Exception('Database not connected. Please configure Supabase.');
+      }
+      await _supabase!.from('users').update({
         'name': user.name,
         'avatar_url': user.avatarUrl,
         'has_completed_onboarding': user.hasCompletedOnboarding,
