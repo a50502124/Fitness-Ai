@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 
+import 'core/config/app_config.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/widgets/empty_state.dart';
@@ -14,18 +15,18 @@ import 'features/onboarding/bloc/onboarding_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  try {
-    // Initialize Supabase with configuration
-    await Supabase.initialize(
-      url: 'https://your-project.supabase.co', // Replace with your Supabase URL
-      anonKey: 'your-anon-key', // Replace with your Supabase anon key
-      debug: true, // Set to false in production
-    );
-  } catch (e) {
-    // Handle Supabase initialization error gracefully
-    debugPrint('Supabase initialization failed: $e');
-    // Continue app execution without Supabase for demo purposes
-  }
+        try {
+          // Initialize Supabase with configuration
+          await Supabase.initialize(
+            url: AppConfig.supabaseUrl,
+            anonKey: AppConfig.supabaseAnonKey,
+            debug: AppConfig.isDebugMode,
+          );
+        } catch (e) {
+          // Handle Supabase initialization error gracefully
+          debugPrint('Supabase initialization failed: $e');
+          // Continue app execution without Supabase for demo purposes
+        }
   
   runApp(const FitCoachApp());
 }
