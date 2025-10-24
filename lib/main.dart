@@ -13,11 +13,16 @@ import 'features/onboarding/bloc/onboarding_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // TODO: Initialize Supabase with real credentials
-  // await Supabase.initialize(
-  //   url: 'YOUR_SUPABASE_URL',
-  //   anonKey: 'YOUR_SUPABASE_ANON_KEY',
-  // );
+  // Initialize Supabase (using demo mode for now)
+  try {
+    await Supabase.initialize(
+      url: 'https://placeholder.supabase.co',
+      anonKey: 'placeholder-key',
+    );
+  } catch (e) {
+    // Supabase initialization failed - app will run in demo mode
+    print('Supabase init failed: $e');
+  }
   
   runApp(const FitCoachApp());
 }
@@ -30,7 +35,8 @@ class FitCoachApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthBloc()..add(AuthCheckRequested()),
+          create: (context) => AuthBloc(),
+          // Don't check auth immediately - let the router handle it
         ),
         BlocProvider(create: (context) => OnboardingBloc()),
       ],
