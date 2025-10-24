@@ -1,0 +1,154 @@
+{
+  "id": "beginner_fullbody",
+  "name": "Beginner Full Body",
+  "description": "Perfect for getting started with fitness",
+  "level": "beginner",
+  "daysPerWeek": 3,
+  "weeks": 4,
+  "estimatedDuration": "45 minutes",
+  "equipment": ["bodyweight", "dumbbells"],
+  "targetAreas": ["full_body"],
+  "days": [
+    {
+      "day": 1,
+      "name": "Upper Body Focus",
+      "focus": "Upper Body",
+      "estimatedDuration": "45 minutes",
+      "exercises": [
+        {
+          "name": "Push-ups",
+          "sets": 3,
+          "reps": "8-12",
+          "rest": "60s",
+          "instructions": "Start in plank position, lower chest to ground, push back up",
+          "tips": "Keep core tight, don't let hips sag",
+          "videoUrl": "https://youtube.com/watch?v=example1"
+        },
+        {
+          "name": "Dumbbell Rows",
+          "sets": 3,
+          "reps": "10-12",
+          "rest": "60s",
+          "instructions": "Bend forward, pull dumbbells to chest",
+          "tips": "Keep back straight, squeeze shoulder blades",
+          "videoUrl": "https://youtube.com/watch?v=example2"
+        },
+        {
+          "name": "Shoulder Press",
+          "sets": 3,
+          "reps": "8-10",
+          "rest": "60s",
+          "instructions": "Press dumbbells overhead from shoulders",
+          "tips": "Keep core engaged, don't arch back",
+          "videoUrl": "https://youtube.com/watch?v=example3"
+        },
+        {
+          "name": "Bicep Curls",
+          "sets": 3,
+          "reps": "10-12",
+          "rest": "45s",
+          "instructions": "Curl dumbbells up to shoulders",
+          "tips": "Keep elbows at sides, control the weight",
+          "videoUrl": "https://youtube.com/watch?v=example4"
+        },
+        {
+          "name": "Tricep Dips",
+          "sets": 3,
+          "reps": "8-10",
+          "rest": "60s",
+          "instructions": "Use chair or bench, lower body down and push up",
+          "tips": "Keep elbows close to body",
+          "videoUrl": "https://youtube.com/watch?v=example5"
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "name": "Lower Body Focus",
+      "focus": "Lower Body",
+      "estimatedDuration": "45 minutes",
+      "exercises": [
+        {
+          "name": "Bodyweight Squats",
+          "sets": 3,
+          "reps": "12-15",
+          "rest": "60s",
+          "instructions": "Stand with feet shoulder-width apart, squat down",
+          "tips": "Keep chest up, knees behind toes",
+          "videoUrl": "https://youtube.com/watch?v=example6"
+        },
+        {
+          "name": "Lunges",
+          "sets": 3,
+          "reps": "10 each leg",
+          "rest": "60s",
+          "instructions": "Step forward into lunge position, alternate legs",
+          "tips": "Keep front knee over ankle",
+          "videoUrl": "https://youtube.com/watch?v=example7"
+        },
+        {
+          "name": "Glute Bridges",
+          "sets": 3,
+          "reps": "12-15",
+          "rest": "45s",
+          "instructions": "Lie on back, lift hips up squeezing glutes",
+          "tips": "Squeeze glutes at the top",
+          "videoUrl": "https://youtube.com/watch?v=example8"
+        },
+        {
+          "name": "Calf Raises",
+          "sets": 3,
+          "reps": "15-20",
+          "rest": "45s",
+          "instructions": "Rise up on toes, lower slowly",
+          "tips": "Control the movement, feel the stretch",
+          "videoUrl": "https://youtube.com/watch?v=example9"
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "name": "Full Body Circuit",
+      "focus": "Full Body",
+      "estimatedDuration": "40 minutes",
+      "exercises": [
+        {
+          "name": "Burpees",
+          "sets": 3,
+          "reps": "5-8",
+          "rest": "90s",
+          "instructions": "Squat down, jump back to plank, do push-up, jump forward, jump up",
+          "tips": "Modify by stepping instead of jumping",
+          "videoUrl": "https://youtube.com/watch?v=example10"
+        },
+        {
+          "name": "Mountain Climbers",
+          "sets": 3,
+          "reps": "20 seconds",
+          "rest": "60s",
+          "instructions": "In plank position, alternate bringing knees to chest",
+          "tips": "Keep core tight, maintain plank position",
+          "videoUrl": "https://youtube.com/watch?v=example11"
+        },
+        {
+          "name": "Plank",
+          "sets": 3,
+          "reps": "30-45 seconds",
+          "rest": "60s",
+          "instructions": "Hold plank position on forearms",
+          "tips": "Keep body straight, engage core",
+          "videoUrl": "https://youtube.com/watch?v=example12"
+        },
+        {
+          "name": "Jumping Jacks",
+          "sets": 3,
+          "reps": "30 seconds",
+          "rest": "45s",
+          "instructions": "Jump feet apart while raising arms overhead",
+          "tips": "Land softly, keep knees slightly bent",
+          "videoUrl": "https://youtube.com/watch?v=example13"
+        }
+      ]
+    }
+  ]
+}
