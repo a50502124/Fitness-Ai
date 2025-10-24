@@ -11,6 +11,7 @@ import '../../features/home/screens/home_screen.dart';
 import '../../features/workouts/screens/workout_library_screen.dart';
 import '../../features/nutrition/screens/nutrition_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/profile/screens/edit_profile_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -71,6 +72,12 @@ class AppRouter {
           GoRoute(
             path: 'profile',
             builder: (context, state) => const ProfileScreen(),
+            routes: [
+              GoRoute(
+                path: 'edit',
+                builder: (context, state) => const EditProfileScreen(),
+              ),
+            ],
           ),
         ],
       ),

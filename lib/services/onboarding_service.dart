@@ -1,39 +1,60 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/onboarding/models/onboarding_data.dart';
+import '../core/error/exceptions.dart';
+import 'data_service.dart';
 
 class OnboardingService {
   final SupabaseClient _supabase = Supabase.instance.client;
+  final DataService _dataService = DataService();
 
   Future<void> saveOnboardingData(OnboardingData data) async {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) {
-        throw Exception('User not authenticated');
+        throw AuthException('User not authenticated');
       }
 
       // Update user profile with onboarding data
       await _supabase.from('users').update({
         'has_completed_onboarding': true,
-        'gender': data.gender,
-        'target_areas': data.targetAreas,
-        'fitness_level': data.fitnessLevel,
-        'workout_location': data.workoutLocation,
-        'days_per_week': data.daysPerWeek,
-        'experience_level': data.experienceLevel,
-        'weekly_goal': data.weeklyGoal,
-        'height': data.height,
-        'weight': data.weight,
-        'unit_system': data.unitSystem,
-        'bmi': data.bmi,
-        'bmi_category': data.bmiCategory,
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', user.id);
+
+      // Save detailed profile data
+      final profileData = {
+        'age': data.age,
+        'gender': data.gender,
+        'height_cm': data.height,
+        'weight_kg': data.weight,
+        'activity_level': _mapFitnessLevelToActivityLevel(data.fitnessLevel),
+        'fitness_goals': data.targetAreas,
+        'medical_conditions': data.medicalConditions ?? [],
+      };
+
+      await _dataService.saveUserProfile(profileData);
 
       // Create user goals based on onboarding data
       await _createUserGoals(data);
 
+    } on AuthException catch (e) {
+      throw AuthException(e.message);
+    } on ServerException catch (e) {
+      throw ServerException(e.message);
     } catch (e) {
-      throw Exception('Failed to save onboarding data: ${e.toString()}');
+      throw ServerException('Failed to save onboarding data: ${e.toString()}');
+    }
+  }
+
+  String _mapFitnessLevelToActivityLevel(String? fitnessLevel) {
+    switch (fitnessLevel?.toLowerCase()) {
+      case 'beginner':
+        return 'light';
+      case 'intermediate':
+        return 'moderate';
+      case 'advanced':
+        return 'active';
+      default:
+        return 'light';
     }
   }
 
@@ -44,25 +65,42 @@ class OnboardingService {
 
       // Calculate daily calorie target based on goal and user data
       final dailyCalories = _calculateDailyCalories(data);
-      final proteinTarget = _calculateProteinTarget(data);
-      final carbTarget = _calculateCarbTarget(data);
-      final fatTarget = _calculateFatTarget(data);
 
-      // Insert user goals
-      await _supabase.from('user_goals').insert({
-        'user_id': user.id,
-        'daily_calories': dailyCalories,
-        'protein_target': proteinTarget,
-        'carb_target': carbTarget,
-        'fat_target': fatTarget,
-        'workout_days_per_week': data.daysPerWeek,
-        'created_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      // Create weight-related goal
+      final goalType = _mapWeeklyGoalToGoalType(data.weeklyGoal);
+      final goalData = {
+        'goal_type': goalType,
+        'target_value': dailyCalories,
+        'current_value': 0.0,
+        'unit': 'calories',
+        'target_date': DateTime.now().add(const Duration(days: 30)).toIso8601String().split('T')[0],
+        'is_achieved': false,
+      };
+
+      await _dataService.saveGoal(goalData);
 
     } catch (e) {
       // Don't throw error for goals creation, it's not critical
       print('Failed to create user goals: $e');
+    }
+  }
+
+  String _mapWeeklyGoalToGoalType(String? weeklyGoal) {
+    switch (weeklyGoal?.toLowerCase()) {
+      case 'lose_weight':
+        return 'weight_loss';
+      case 'gain_weight':
+        return 'weight_gain';
+      case 'build_muscle':
+        return 'muscle_gain';
+      case 'improve_endurance':
+        return 'endurance';
+      case 'get_stronger':
+        return 'strength';
+      case 'improve_flexibility':
+        return 'flexibility';
+      default:
+        return 'weight_loss';
     }
   }
 

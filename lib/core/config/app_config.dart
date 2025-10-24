@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConfig {
   // App Information
   static const String appName = 'FitCoach AI';
@@ -5,14 +7,14 @@ class AppConfig {
   static const String appDescription = 'AI-powered fitness coaching app';
   
   // API Configuration
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? 'YOUR_SUPABASE_URL';
+  static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? 'YOUR_SUPABASE_ANON_KEY';
   
   // AI Services (Optional for MVP)
-  static const String deepSeekApiKey = 'YOUR_DEEPSEEK_API_KEY';
-  static const String geminiApiKey = 'YOUR_GEMINI_API_KEY';
-  static const String fatSecretApiKey = 'YOUR_FATSECRET_API_KEY';
-  static const String replicateApiKey = 'YOUR_REPLICATE_API_KEY';
+  static String get deepSeekApiKey => dotenv.env['DEEPSEEK_API_KEY'] ?? 'YOUR_DEEPSEEK_API_KEY';
+  static String get geminiApiKey => dotenv.env['GEMINI_API_KEY'] ?? 'YOUR_GEMINI_API_KEY';
+  static String get fatSecretApiKey => dotenv.env['FATSECRET_API_KEY'] ?? 'YOUR_FATSECRET_API_KEY';
+  static String get replicateApiKey => dotenv.env['REPLICATE_API_KEY'] ?? 'YOUR_REPLICATE_API_KEY';
   
   // Feature Flags
   static const bool enableAI = false; // Set to true when AI features are ready

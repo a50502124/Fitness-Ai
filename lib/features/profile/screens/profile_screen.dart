@@ -5,12 +5,24 @@ import 'package:go_router/go_router.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
+import '../bloc/profile_bloc.dart';
 import '../../../core/widgets/frosted_card.dart';
 import '../../../core/widgets/animated_background.dart';
 import '../../../core/theme/app_colors.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileBloc>().add(const ProfileLoadRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +88,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             IconButton(
                               onPressed: () {
-                                // TODO: Edit profile
+                                context.push('/profile/edit');
                               },
                               icon: const Icon(Icons.edit),
                             ),
@@ -101,54 +113,91 @@ class ProfileScreen extends StatelessWidget {
                 
                 const SizedBox(height: 16),
                 
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        'Workouts',
-                        '24',
-                        'This month',
-                        Icons.fitness_center,
-                        AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildStatCard(
-                        'Streak',
-                        '7 days',
-                        'Current',
-                        Icons.local_fire_department,
-                        AppColors.secondary,
-                      ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 16),
-                
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        'Weight',
-                        '70 kg',
-                        'Down 2 kg',
-                        Icons.monitor_weight,
-                        AppColors.accent,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildStatCard(
-                        'BMI',
-                        '22.5',
-                        'Healthy',
-                        Icons.health_and_safety,
-                        AppColors.success,
-                      ),
-                    ),
-                  ],
+                BlocBuilder<ProfileBloc, ProfileState>(
+                  builder: (context, state) {
+                    if (state is ProfileLoaded && state.profile != null) {
+                      final profile = state.profile!;
+                      final weight = profile['weight_kg']?.toString() ?? 'N/A';
+                      final height = profile['height_cm']?.toDouble() ?? 0.0;
+                      final bmi = height > 0 ? (profile['weight_kg']?.toDouble() ?? 0.0) / ((height / 100) * (height / 100)) : 0.0;
+                      
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  'Weight',
+                                  '${weight} kg',
+                                  'Current',
+                                  Icons.monitor_weight,
+                                  AppColors.accent,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildStatCard(
+                                  'BMI',
+                                  bmi > 0 ? bmi.toStringAsFixed(1) : 'N/A',
+                                  _getBMICategory(bmi),
+                                  Icons.health_and_safety,
+                                  _getBMIColor(bmi),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  'Activity',
+                                  _formatActivityLevel(profile['activity_level'] ?? 'light'),
+                                  'Level',
+                                  Icons.directions_run,
+                                  AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildStatCard(
+                                  'Goals',
+                                  '${(profile['fitness_goals'] as List?)?.length ?? 0}',
+                                  'Active',
+                                  Icons.flag,
+                                  AppColors.secondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                    
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatCard(
+                            'Weight',
+                            'N/A',
+                            'Not set',
+                            Icons.monitor_weight,
+                            AppColors.accent,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildStatCard(
+                            'BMI',
+                            'N/A',
+                            'Not set',
+                            Icons.health_and_safety,
+                            AppColors.success,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 
                 const SizedBox(height: 32),
@@ -168,7 +217,7 @@ class ProfileScreen extends StatelessWidget {
                   'Edit Profile',
                   Icons.person_outline,
                   () {
-                    // TODO: Edit profile
+                    context.push('/profile/edit');
                   },
                 ),
                 
@@ -318,5 +367,36 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getBMICategory(double bmi) {
+    if (bmi < 18.5) return 'Underweight';
+    if (bmi < 25) return 'Normal';
+    if (bmi < 30) return 'Overweight';
+    return 'Obese';
+  }
+
+  Color _getBMIColor(double bmi) {
+    if (bmi < 18.5) return AppColors.warning;
+    if (bmi < 25) return AppColors.success;
+    if (bmi < 30) return AppColors.warning;
+    return AppColors.error;
+  }
+
+  String _formatActivityLevel(String level) {
+    switch (level) {
+      case 'sedentary':
+        return 'Sedentary';
+      case 'light':
+        return 'Light';
+      case 'moderate':
+        return 'Moderate';
+      case 'active':
+        return 'Active';
+      case 'very_active':
+        return 'Very Active';
+      default:
+        return 'Light';
+    }
   }
 }
