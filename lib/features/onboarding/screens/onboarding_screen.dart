@@ -68,16 +68,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildOnboardingStep(app_state.OnboardingInProgress state) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
-            // Progress Bar
+            // Progress Bar - Cal AI Style
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ProgressBar(
-                progress: state.currentStep / state.totalSteps,
-                height: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: _buildProgressIndicator(state.currentStep, state.totalSteps),
             ),
             
             // Step Content
@@ -87,6 +85,56 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildProgressIndicator(int currentStep, int totalSteps) {
+    final progress = currentStep / totalSteps;
+    
+    return Column(
+      children: [
+        // Step Counter
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Step $currentStep of $totalSteps',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '${(progress * 100).round()}%',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Progress Bar
+        Container(
+          height: 4,
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainer,
+            borderRadius: BorderRadius.circular(2),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: progress,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
