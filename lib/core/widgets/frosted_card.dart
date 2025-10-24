@@ -41,35 +41,37 @@ class FrostedCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(borderRadius),
+          splashColor: AppColors.accent.withOpacity(0.1),
+          highlightColor: AppColors.accent.withOpacity(0.05),
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
               color: backgroundColor ?? 
                   (isDark 
-                      ? AppColors.darkSurface.withOpacity(0.8)
-                      : AppColors.surface.withOpacity(0.9)),
+                      ? AppColors.darkSurface
+                      : AppColors.surface),
               borderRadius: BorderRadius.circular(borderRadius),
               border: border ?? 
                   Border.all(
                     color: isDark 
-                        ? AppColors.darkSurfaceVariant.withOpacity(0.3)
-                        : AppColors.surfaceVariant.withOpacity(0.5),
+                        ? AppColors.darkBorder
+                        : AppColors.border,
                     width: 1,
                   ),
               boxShadow: boxShadow ?? [
                 BoxShadow(
                   color: isDark 
-                      ? Colors.black.withOpacity(0.3)
-                      : Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                      ? Colors.black.withOpacity(0.2)
+                      : Colors.black.withOpacity(0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
                 BoxShadow(
                   color: isDark 
                       ? Colors.black.withOpacity(0.1)
-                      : Colors.white.withOpacity(0.8),
-                  blurRadius: 8,
-                  offset: const Offset(0, -2),
+                      : Colors.black.withOpacity(0.02),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),

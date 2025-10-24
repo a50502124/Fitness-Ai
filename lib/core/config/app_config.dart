@@ -5,8 +5,9 @@ class AppConfig {
   static const String appDescription = 'AI-powered fitness coaching app';
   
   // API Configuration
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+  // TODO: Replace with your actual Supabase credentials
+  static const String supabaseUrl = 'https://your-project.supabase.co';
+  static const String supabaseAnonKey = 'your-anon-key';
   
   // AI Services (Optional for MVP)
   static const String deepSeekApiKey = 'YOUR_DEEPSEEK_API_KEY';

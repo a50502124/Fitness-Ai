@@ -37,3 +37,12 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [message];
 }
+
+class AuthEmailConfirmationRequired extends AuthState {
+  final String email;
+
+  const AuthEmailConfirmationRequired({required this.email});
+
+  @override
+  List<Object> get props => [email];
+}

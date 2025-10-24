@@ -29,132 +29,228 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBackground(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              const Spacer(),
-              Text(
-                'What\'s your height and weight?',
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 20),
+            
+            // Header Section
+            Column(
+              children: [
+                // Title - Cal AI Style
+                Text(
+                  'What\'s your height and weight?',
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    letterSpacing: -0.5,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
-              
-              // Unit System Toggle
-              FrostedCard(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _unitSystem = 'metric'),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: _unitSystem == 'metric' ? AppColors.primary : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            'Metric (cm, kg)',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: _unitSystem == 'metric' ? Colors.white : AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _unitSystem = 'imperial'),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: _unitSystem == 'imperial' ? AppColors.primary : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            'Imperial (ft, lbs)',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: _unitSystem == 'imperial' ? Colors.white : AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                
+                const SizedBox(height: 12),
+                
+                // Subtitle
+                Text(
+                  'This helps us calculate your BMI and personalize your workouts',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
+              ],
+            ),
+            
+            const SizedBox(height: 48),
               
-              const SizedBox(height: 24),
+            // Unit System Toggle - Cal AI Style
+            _buildUnitSystemToggle(),
               
-              // Height Input
-              FrostedCard(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Height',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _heightController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        hintText: _unitSystem == 'metric' ? '170 cm' : '5\'7"',
-                        suffixText: _unitSystem == 'metric' ? 'cm' : 'ft',
-                      ),
-                    ),
-                  ],
+            const SizedBox(height: 32),
+            
+            // Height Input - Cal AI Style
+            _buildInputField(
+              controller: _heightController,
+              label: 'Height',
+              hint: _unitSystem == 'metric' ? '170' : '5\'7"',
+              suffix: _unitSystem == 'metric' ? 'cm' : 'ft',
+              keyboardType: TextInputType.number,
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Weight Input - Cal AI Style
+            _buildInputField(
+              controller: _weightController,
+              label: 'Weight',
+              hint: _unitSystem == 'metric' ? '70' : '150',
+              suffix: _unitSystem == 'metric' ? 'kg' : 'lbs',
+              keyboardType: TextInputType.number,
+            ),
+            
+            const Spacer(),
+            
+            // Continue Button - Cal AI Style
+            _buildContinueButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUnitSystemToggle() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _unitSystem = 'metric'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: _unitSystem == 'metric' ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Weight Input
-              FrostedCard(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Weight',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _weightController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        hintText: _unitSystem == 'metric' ? '70 kg' : '150 lbs',
-                        suffixText: _unitSystem == 'metric' ? 'kg' : 'lbs',
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  'Metric (cm, kg)',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: _unitSystem == 'metric' ? Colors.white : AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              
-              const Spacer(),
-              
-              // Continue Button
-              AnimatedGradientButton(
-                text: 'Complete Setup',
-                onPressed: _onContinue,
-                width: double.infinity,
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _unitSystem = 'imperial'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: _unitSystem == 'imperial' ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Imperial (ft, lbs)',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: _unitSystem == 'imperial' ? Colors.white : AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required String suffix,
+    required TextInputType keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.border,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w400,
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.textTertiary,
+                fontWeight: FontWeight.w400,
+              ),
+              suffixText: suffix,
+              suffixStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 20,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContinueButton() {
+    final isEnabled = _heightController.text.isNotEmpty && _weightController.text.isNotEmpty;
+    
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        color: isEnabled ? AppColors.primary : AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isEnabled ? [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ] : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled ? _onContinue : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              'Complete Setup',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: isEnabled ? Colors.white : AppColors.textTertiary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ),
       ),
@@ -167,7 +263,10 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
     
     if (heightText.isEmpty || weightText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both height and weight')),
+        SnackBar(
+          content: const Text('Please enter both height and weight'),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }
@@ -177,7 +276,10 @@ class _HeightWeightScreenState extends State<HeightWeightScreen> {
     
     if (height == null || weight == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter valid numbers')),
+        SnackBar(
+          content: const Text('Please enter valid numbers'),
+          backgroundColor: AppColors.error,
+        ),
       );
       return;
     }

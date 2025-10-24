@@ -115,15 +115,14 @@ class AppTheme {
         color: AppColors.surface,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.surfaceVariant,
+        filled: false,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
@@ -136,6 +135,12 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(
           horizontal: spacingM,
           vertical: spacingM,
+        ),
+        labelStyle: AppTypography.bodyMedium?.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        hintStyle: AppTypography.bodyLarge?.copyWith(
+          color: AppColors.textTertiary,
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -238,15 +243,14 @@ class AppTheme {
         color: AppColors.darkSurface,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.darkSurfaceVariant,
+        filled: false,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.darkBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.darkBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
@@ -259,6 +263,12 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(
           horizontal: spacingM,
           vertical: spacingM,
+        ),
+        labelStyle: AppTypography.getDarkStyle(AppTypography.bodyMedium)?.copyWith(
+          color: AppColors.darkTextSecondary,
+        ),
+        hintStyle: AppTypography.getDarkStyle(AppTypography.bodyLarge)?.copyWith(
+          color: AppColors.darkTextTertiary,
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
