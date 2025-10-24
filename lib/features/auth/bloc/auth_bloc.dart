@@ -66,7 +66,12 @@ class AuthBloc extends Bloc<AuthEvent, app_auth.AuthState> {
       );
       emit(app_auth.AuthAuthenticated(user: user));
     } catch (e) {
-      emit(app_auth.AuthError(message: e.toString()));
+      final errorMessage = e.toString();
+      if (errorMessage.contains('confirmation link')) {
+        emit(app_auth.AuthEmailConfirmationRequired(email: event.email));
+      } else {
+        emit(app_auth.AuthError(message: errorMessage));
+      }
     }
   }
 

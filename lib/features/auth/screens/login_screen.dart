@@ -9,6 +9,7 @@ import '../../../core/widgets/animated_gradient_button.dart';
 import '../../../core/widgets/frosted_card.dart';
 import '../../../core/widgets/animated_background.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/validation_utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,11 +36,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          _showErrorDialog(state.message);
         } else if (state is AuthAuthenticated) {
-          context.go('/home');
+          if (state.user.hasCompletedOnboarding) {
+            context.go('/home');
+          } else {
+            context.go('/onboarding');
+          }
         }
       },
       child: AnimatedBackground(
@@ -88,8 +91,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
                           }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
+                          if (!ValidationUtils.isValidEmail(value)) {
+                            return 'Please enter a valid email address';
                           }
                           return null;
                         },
@@ -191,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
         AuthLoginRequested(
-          email: _emailController.text.trim(),
+          email: _emailController.text.trim().toLowerCase(),
           password: _passwordController.text,
         ),
       );
@@ -203,9 +206,77 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onForgotPassword() {
-    // TODO: Implement forgot password
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Forgot password feature coming soon')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter your email address and we\'ll send you a link to reset your password.'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                hintText: 'Enter your email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _resetPassword();
+            },
+            child: const Text('Send Reset Link'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _resetPassword() {
+    if (_emailController.text.isNotEmpty && ValidationUtils.isValidEmail(_emailController.text)) {
+      context.read<AuthBloc>().add(
+        AuthPasswordResetRequested(email: _emailController.text.trim().toLowerCase()),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset email sent!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid email address'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Failed'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -56,10 +56,13 @@ class AuthService {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'name': name,
+        },
       );
 
       if (response.user == null) {
-        throw Exception('Signup failed');
+        throw Exception('Signup failed - no user created');
       }
 
       // Create user profile in database
@@ -74,9 +77,27 @@ class AuthService {
 
       await _supabase.from('users').insert(userData);
 
+      // Check if email confirmation is required
+      if (response.session == null) {
+        throw Exception('Please check your email and click the confirmation link to complete your registration');
+      }
+
       return UserModel.fromJson(userData);
     } catch (e) {
-      throw Exception('Signup failed: ${e.toString()}');
+      debugPrint('Signup error: $e');
+      
+      // Handle specific Supabase errors
+      if (e.toString().contains('User already registered')) {
+        throw Exception('An account with this email already exists. Please try logging in instead.');
+      } else if (e.toString().contains('Password should be at least')) {
+        throw Exception('Password must be at least 6 characters long');
+      } else if (e.toString().contains('Invalid email')) {
+        throw Exception('Please enter a valid email address');
+      } else if (e.toString().contains('Email rate limit exceeded')) {
+        throw Exception('Too many signup attempts. Please try again later.');
+      } else {
+        throw Exception('Signup failed: ${e.toString()}');
+      }
     }
   }
 
