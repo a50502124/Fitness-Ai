@@ -21,7 +21,28 @@ class AppRouter {
         return null;
       }
       
-      // For now, redirect to home to test the app
+      // Check authentication state
+      final authBloc = context.read<AuthBloc>();
+      final authState = authBloc.state;
+      
+      // If user is not authenticated and trying to access protected routes
+      if (authState is AuthUnauthenticated || authState is AuthError) {
+        if (state.uri.path != '/login' && state.uri.path != '/signup') {
+          return '/login';
+        }
+      }
+      
+      // If user is authenticated but hasn't completed onboarding
+      if (authState is AuthAuthenticated) {
+        if (!authState.user.hasCompletedOnboarding && state.uri.path != '/onboarding') {
+          return '/onboarding';
+        }
+        if (authState.user.hasCompletedOnboarding && state.uri.path == '/onboarding') {
+          return '/home';
+        }
+      }
+      
+      // Default redirect to home for root path
       if (state.uri.path == '/') {
         return '/home';
       }

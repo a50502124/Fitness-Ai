@@ -33,6 +33,7 @@ class OnboardingService {
       await _createUserGoals(data);
 
     } catch (e) {
+      debugPrint('Onboarding save error: $e');
       throw Exception('Failed to save onboarding data: ${e.toString()}');
     }
   }

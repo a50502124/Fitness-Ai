@@ -32,7 +32,8 @@ class AuthBloc extends Bloc<AuthEvent, app_auth.AuthState> {
         emit(const app_auth.AuthUnauthenticated());
       }
     } catch (e) {
-      emit(app_auth.AuthError(message: e.toString()));
+      debugPrint('Auth check error: $e');
+      emit(app_auth.AuthError(message: 'Failed to check authentication status'));
     }
   }
 

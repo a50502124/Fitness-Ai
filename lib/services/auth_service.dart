@@ -17,6 +17,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
+      debugPrint('Error getting current user: $e');
       return null;
     }
   }
@@ -41,6 +42,7 @@ class AuthService {
 
       return UserModel.fromJson(userData);
     } catch (e) {
+      debugPrint('Login error: $e');
       throw Exception('Login failed: ${e.toString()}');
     }
   }
